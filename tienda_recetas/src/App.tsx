@@ -1,33 +1,54 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Grid, GridItem } from '@chakra-ui/react'
+import Header from './Components/Header'
+import MainContent from './Components/MainContent'
+import SideNav from './Components/SideNav'
+import { useState } from 'react';
+import type { Category, Meal } from './types';
+import useHttpData from './Hooks/useHttpData';
+
+const url = "https://www.themealdb.com/api/json/v1/1/list.php?c=list";
+
+const makeMealUrl = (category: Category) => `https://www.themealdb.com/api/json/v1/1/filter.php?c=${category.strCategory}`
+
+const defaultCategory = {
+  strCategory: "Beef",
+}
 
 function App() {
-  const [count, setCount] = useState(0)
-
-  return (
+  const [selectedCategory, setSelectedCategory] = useState<Category>(defaultCategory);
+  
+  const {loading, data } = useHttpData<Category>(url);
+  const {loading: loadingMeal, data: dataMeal } = useHttpData<Meal>
+  (makeMealUrl(defaultCategory));
+   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Grid
+        templateAreas={`"header header"
+                        "nav main"`}
+        gridTemplateRows={"60px 1fr "}
+        gridTemplateColumns={{sm: `0 1fr`, md:`250px 1fr` }}
+        fontSize={14}
+      >
+        <GridItem 
+        boxShadow="lg" zIndex="1" pos="sticky"
+        top="0px" pt='7px' bg='white' area={'header'}>
+          <Header />
+        </GridItem>
+        <GridItem 
+        pos="sticky" top="60px" left="0px" p='5' 
+        area={'nav'} height="calc(100vh - 60px)"
+        overflowY="auto"
+        >
+         <SideNav 
+         categories={data} loading={loading}
+        selectedCategory = {selectedCategory}
+          setSelectedCategory = {setSelectedCategory}
+         />
+        </GridItem>
+        <GridItem p='4' bg='gray.100' area={'main'}>
+          <MainContent loading={loadingMeal} meals={dataMeal}/>
+        </GridItem>
+      </Grid>
     </>
   )
 }
