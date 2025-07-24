@@ -8,3 +8,11 @@ export type Meal = {
     idMeal: string;
 
 }
+
+export type SearchForm = {
+  search: string;
+}
+
+export type MealDetails = {
+  [key:string] : string;
+}

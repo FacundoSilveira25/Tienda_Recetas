@@ -19,5 +19,5 @@ export default function useHttpData<T>(url: string){
     .finally(()=> setLoading(false))
     return () => controller.abort()
   }, []);
-  return { loading, data}
+  return { loading, data, setData, setLoading}
 }
